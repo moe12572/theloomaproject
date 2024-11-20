@@ -3,6 +3,7 @@ import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
 const DataTester = () => {
   const [userId, setUserId] = useState("");
+  const [note, setNote] = useState("");
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -45,6 +46,34 @@ const DataTester = () => {
     }
   };
 
+  const addNote = async () => {
+    if (!validateForm() || !note.trim()) {
+      setError("Note content is required.");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/recent-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, note }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "An error occurred while adding the note.");
+      } else {
+        setError(null);
+        setNote(""); // Clear the note input
+        alert("Note added successfully!");
+      }
+    } catch (err) {
+      setError(`Failed to add note. Please try again. Error: ${err.message}`);
+    }
+  };
   if (!isMounted) return null; // Prevents SSR mismatches
 
   return (
@@ -56,6 +85,31 @@ const DataTester = () => {
         }}
         className="flex flex-col gap-4"
       >
+        {!error ? (
+          <div className="bg-yellow-100 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <ExclamationCircleIcon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm">
+                  This is using mocks and a test environment. Please enter a user ID from 1 to 5, as those are the available mock data.
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-red-100 text-red-700 p-4 rounded-lg" role="alert">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <ExclamationCircleIcon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm">{error}</p>
+              </div>
+            </div>
+          </div>
+        )}
         <label htmlFor="disconnectNotes" className="text-gray-700 font-medium">
           <input
             type="checkbox"
@@ -94,6 +148,34 @@ const DataTester = () => {
           Fetch Data
         </button>
       </form>
+
+      <div className="mt-6">
+        <h3 className="text-lg font-bold text-gray-800 mb-2">Add a New Note:</h3>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            addNote();
+          }}
+          className="flex flex-col gap-4"
+        >
+          <label htmlFor="note" className="text-gray-700 font-medium">
+            Note Content:
+          </label>
+          <textarea
+            id="note"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+            placeholder="Enter your note here"
+          />
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 focus:ring focus:ring-green-300"
+          >
+            Add Note
+          </button>
+        </form>
+      </div>
 
       {result && (
         <div className="mt-6 bg-gray-100 p-4 rounded-lg shadow">

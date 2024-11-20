@@ -65,3 +65,28 @@ export const getTasksFromMock = async (userId) => {
 
   return userTasks;
 };
+
+// Mock function to add a note
+export const addNoteMock = async (userId, note) => {
+  const timestamp = Date.now();
+  console.log(`Mock adding note: { userId: ${userId}, timestamp: ${timestamp}, note: "${note}" }`);
+  return { userId, timestamp, note };
+};
+
+// Mock POST handler
+export async function POST(req) {
+  try {
+    const { userId, note } = await req.json();
+
+    if (!userId || !note) {
+      return new Response(JSON.stringify({ error: 'userId and note are required' }), { status: 400 });
+    }
+
+    const newNote = await addNoteMock(userId, note);
+
+    return new Response(JSON.stringify({ message: 'Note added successfully', note: newNote }), { status: 200 });
+  } catch (error) {
+    console.error('Error adding note:', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+  }
+}
