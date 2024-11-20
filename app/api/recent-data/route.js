@@ -4,6 +4,8 @@ import { mockTasks, users } from './__mocks__';
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
   const userId = parseInt(searchParams.get('user_id'));
+  const connectionStatusNotes = searchParams.get('disconnectNotes') === 'true';
+  const connectionStatusTasks = searchParams.get('disconnectTasks') === 'true';
 
   if (!userId) {
     return new Response(JSON.stringify({ error: 'user_id is required' }), { status: 400 });
@@ -28,11 +30,9 @@ export async function GET(req) {
   });
 
   try {
-    // Fetch the ten most recent notes and tasks separately
-    const [notes, tasks] = await Promise.all([
-      getNotesFromCSV(userId, 10, abortController.signal),
-      getTasksFromMock(userId),
-    ]);
+    // Fetch the ten most recent notes and tasks separately if not disconnected
+    const notes = connectionStatusNotes ? [] : await getNotesFromCSV(userId, 10, abortController.signal);
+    const tasks = connectionStatusTasks ? [] : await getTasksFromMock(userId);
 
     // Sort notes and tasks individually in ascending order
     const sortedNotes = notes.sort((a, b) => a.timestamp - b.timestamp);
@@ -50,7 +50,7 @@ export async function GET(req) {
     );
   } catch (error) {
     console.error('Error processing request:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
 

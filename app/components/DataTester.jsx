@@ -1,13 +1,13 @@
-"use client";
-
 import { useState, useEffect } from "react";
-import { ExclamationCircleIcon } from "@heroicons/react/24/solid";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
 
-export default function DataTester() {
+const DataTester = () => {
   const [userId, setUserId] = useState("");
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
+  const [disconnectNotes, setDisconnectNotes] = useState(false);
+  const [disconnectTasks, setDisconnectTasks] = useState(false);
 
   useEffect(() => {
     setIsMounted(true); // Ensures the component is mounted in the browser
@@ -30,7 +30,7 @@ export default function DataTester() {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch(`/api/recent-data?user_id=${userId}`);
+      const response = await fetch(`/api/recent-data?user_id=${userId}&disconnectNotes=${disconnectNotes}&disconnectTasks=${disconnectTasks}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -56,32 +56,26 @@ export default function DataTester() {
         }}
         className="flex flex-col gap-4"
       >
-        {!error && (
-          <div className="bg-yellow-100 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <ExclamationCircleIcon className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm">
-                  This is using mocks and a test environment. Please enter a user ID from 1 to 5, as those are the available mock data.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        {error && (
-          <div className="bg-red-100 text-red-700 p-4 rounded-lg" role="alert">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <ExclamationCircleIcon className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <div className="ml-3">
-                <p className="text-sm">{error}</p>
-              </div>
-            </div>
-          </div>
-        )}
+        <label htmlFor="disconnectNotes" className="text-gray-700 font-medium">
+          <input
+            type="checkbox"
+            id="disconnectNotes"
+            checked={disconnectNotes}
+            onChange={(e) => setDisconnectNotes(e.target.checked)}
+            className="mr-2"
+          />
+          Disconnect Notes Data Source
+        </label>
+        <label htmlFor="disconnectTasks" className="text-gray-700 font-medium">
+          <input
+            type="checkbox"
+            id="disconnectTasks"
+            checked={disconnectTasks}
+            onChange={(e) => setDisconnectTasks(e.target.checked)}
+            className="mr-2"
+          />
+          Disconnect Tasks Data Source
+        </label>
         <label htmlFor="userId" className="text-gray-700 font-medium">
           Enter User ID:
         </label>
@@ -112,3 +106,5 @@ export default function DataTester() {
     </div>
   );
 }
+
+export default DataTester;
