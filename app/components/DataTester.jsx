@@ -41,7 +41,7 @@ export default function DataTester() {
         setError(null);
       }
     } catch (err) {
-      setError("Failed to fetch data. Please try again.");
+      setError(`Failed to fetch data. Please try again. Error: ${err.message}`);
     }
   };
 
