@@ -7,11 +7,11 @@ export default function DataTester() {
   const [userId, setUserId] = useState("");
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  // const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // useEffect(() => {
-  //   setIsMounted(true); // Ensures the component is mounted in the browser
-  // }, []);
+  useEffect(() => {
+    setIsMounted(true); // Ensures the component is mounted in the browser
+  }, []);
 
   const validateForm = () => {
     if (!userId.trim()) {
@@ -45,7 +45,7 @@ export default function DataTester() {
     }
   };
 
-  // if (!isMounted) return null; // Prevents SSR mismatches
+  if (!isMounted) return null; // Prevents SSR mismatches
 
   return (
     <div>

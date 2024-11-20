@@ -31,6 +31,7 @@ export async function GET(req) {
   return NextResponse.json({
     user_id: user.id,
     user_name: user.name,
-    data: sortedData,
+    tasks: sortedData.filter((item) => item.task),
+    notes: sortedData.filter((item) => item.note),
   });
 }
