@@ -1,3 +1,5 @@
+"use client";
+
 import DataTester from "./components/DataTester";
 
 export default function Home() {
@@ -20,7 +22,7 @@ export default function Home() {
         </p>
         <p className="mt-2">
           <a
-            href="https://github.com/your-repo-link"
+            href="https://github.com/moe12572/theloomaproject"
             className="text-blue-600 hover:underline font-medium"
             target="_blank"
             rel="noopener noreferrer"
