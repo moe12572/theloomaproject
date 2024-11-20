@@ -90,7 +90,7 @@ export default function DataTester() {
           id="userId"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
+          className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg shadow-sm focus:ring focus:ring-blue-300 focus:outline-none"
           placeholder="e.g., 1"
         />
         <button

@@ -1,41 +1,67 @@
-import { mockNotes, mockTasks, users } from './__mocks__';
+import { getNotesFromCSV } from '@/app/utils/getNotesFromCSV';
+import { mockTasks, users } from './__mocks__';
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
-  const userId = parseInt(searchParams.get("user_id"));
+  const userId = parseInt(searchParams.get('user_id'));
 
   if (!userId) {
-    return new Response(JSON.stringify({ error: "user_id is required" }), { status: 400 });
+    return new Response(JSON.stringify({ error: 'user_id is required' }), { status: 400 });
   }
 
   const user = users.find((u) => u.id === userId);
   if (!user) {
-    return new Response(JSON.stringify({
-      error: "User not found. This is using mocks and a test environment. Please enter a user ID from 1 to 5, as those are the available mock data.",
-    }),
+    return new Response(
+      JSON.stringify({
+        error:
+          'User not found. This is using mocks and a test environment. Please enter a valid user ID.',
+      }),
       { status: 404 }
     );
   }
 
-  const userNotes = mockNotes
-    .filter((n) => n.user_id === userId)
-    .map(({ note, timestamp }) => ({ name: note, timestamp: timestamp, user_id: userId }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .slice(0, 10);
+  const abortController = new AbortController();
 
+  // Handle unexpected request closures
+  req.signal.addEventListener('abort', () => {
+    abortController.abort();
+  });
+
+  try {
+    // Fetch the ten most recent notes and tasks separately
+    const [notes, tasks] = await Promise.all([
+      getNotesFromCSV(userId, 10, abortController.signal),
+      getTasksFromMock(userId),
+    ]);
+
+    // Sort notes and tasks individually in ascending order
+    const sortedNotes = notes.sort((a, b) => a.timestamp - b.timestamp);
+    const sortedTasks = tasks.sort((a, b) => a.timestamp - b.timestamp);
+
+    // Return the response with both tasks and notes
+    return new Response(
+      JSON.stringify({
+        user_id: userId,
+        user_name: user.name,
+        tasks: sortedTasks,
+        notes: sortedNotes,
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error processing request:', error);
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+  }
+}
+
+// Mock function to get tasks for a user
+export const getTasksFromMock = async (userId) => {
   const userTasks = mockTasks
     .filter((t) => t.user_id === userId)
-    .map(({ task, timestamp }) => ({ name: task, timestamp: timestamp, user_id: userId }))
-    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
-    .slice(0, 10);
+    .map(({ task, timestamp, user_id }) => ({ task, timestamp, user_id }))
+    .sort((a, b) => b.timestamp - a.timestamp) // Sort in descending order
+    .slice(0, 10) // Get the ten most recent tasks
+    .sort((a, b) => a.timestamp - b.timestamp); // Then sort back to ascending
 
-  return new Response(
-    JSON.stringify({
-      user_id: user.id,
-      user_name: user.name,
-      tasks: userTasks,
-      notes: userNotes,
-    }),
-    { status: 200 }
-  );
-}
+  return userTasks;
+};
