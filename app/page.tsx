@@ -30,6 +30,16 @@ export default function Home() {
             View Repository on GitHub
           </a>
         </p>
+        <p className="mt-2">
+          <a
+            href="https://github.com/moe12572/theloomaproject/blob/main/README.md"
+            className="text-blue-600 hover:underline font-medium"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Q&A's (part 2): README
+          </a>
+        </p>
       </footer>
     </div>
   );
