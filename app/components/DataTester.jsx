@@ -30,10 +30,10 @@ export default function DataTester() {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch(`/api/mock?user_id=${userId}`);
+      const response = await fetch(`/api/recent-data?user_id=${userId}`);
       const data = await response.json();
 
-      if (response.status !== 200) {
+      if (!response.ok) {
         setError(data.error || "An error occurred.");
         setResult(null);
       } else {
@@ -56,6 +56,20 @@ export default function DataTester() {
         }}
         className="flex flex-col gap-4"
       >
+        {!error && (
+          <div className="bg-yellow-100 text-yellow-700 p-4 rounded-lg mb-4" role="alert">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <ExclamationCircleIcon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm">
+                  This is using mocks and a test environment. Please enter a user ID from 1 to 5, as those are the available mock data.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {error && (
           <div className="bg-red-100 text-red-700 p-4 rounded-lg" role="alert">
             <div className="flex">
