@@ -15,4 +15,4 @@ export const appendNoteToCSV = (userId, timestamp, note) => {
       }
     });
   });
-}; 
+};
