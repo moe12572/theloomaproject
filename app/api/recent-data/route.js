@@ -19,14 +19,14 @@ export async function GET(req) {
 
   const userNotes = mockNotes
     .filter((n) => n.user_id === userId)
-    .map(({ note, timestamp }) => ({ name: note, date: timestamp }))
+    .map(({ note, timestamp }) => ({ name: note, timestamp: timestamp, user_id: userId }))
     .sort((a, b) => new Date(a.date) - new Date(b.date))
     .slice(0, 10);
 
   const userTasks = mockTasks
     .filter((t) => t.user_id === userId)
-    .map(({ task, timestamp }) => ({ name: task, date: timestamp }))
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .map(({ task, timestamp }) => ({ name: task, timestamp: timestamp, user_id: userId }))
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
     .slice(0, 10);
 
   return new Response(
