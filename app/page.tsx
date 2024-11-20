@@ -37,7 +37,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Q&A's (part 2): README
+            Q&A (part 2): README
           </a>
         </p>
       </footer>
