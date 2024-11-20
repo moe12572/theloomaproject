@@ -25,19 +25,14 @@ export const getNotesFromCSV = async (userId, maxNotes = 10, abortSignal) => {
       if (rowUserId === userId) {
         const timestamp = parseInt(timestampStr);
         notesBuffer.push({ timestamp, note, user_id: userId });
-
-        if (notesBuffer.length > maxNotes) {
-          // Remove the earliest note to keep the buffer size at maxNotes
-          notesBuffer.sort((a, b) => b.timestamp - a.timestamp); // Sort in descending order
-          notesBuffer.pop(); // Remove the oldest note
-        }
       }
     });
 
     rl.on('close', () => {
-      // Before resolving, sort notes in ascending order
-      notesBuffer.sort((a, b) => a.timestamp - b.timestamp);
-      resolve(notesBuffer);
+      // Sort notes in descending order to get the latest notes
+      notesBuffer.sort((a, b) => b.timestamp - a.timestamp);
+      // Return the latest maxNotes
+      resolve(notesBuffer.slice(notesBuffer.length - 10, notesBuffer.length));
     });
 
     rl.on('error', (err) => {
