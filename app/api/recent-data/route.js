@@ -36,8 +36,8 @@ export async function GET(req) {
     const tasks = connectionStatusTasks ? [] : await getTasksFromMock(userId);
 
     // Sort notes and tasks individually in descending order and take the first ten
-    const sortedNotes = notes.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
-    const sortedTasks = tasks.sort((a, b) => b.timestamp - a.timestamp).slice(0, 10);
+    const sortedNotes = notes.slice(-10);
+    const sortedTasks = tasks.slice(-10);
 
     // Return the response with both tasks and notes
     return new Response(
@@ -60,8 +60,7 @@ export const getTasksFromMock = async (userId) => {
   const userTasks = mockTasks
     .filter((t) => t.user_id === userId)
     .map(({ task, timestamp, user_id }) => ({ task, timestamp, user_id }))
-    .sort((a, b) => b.timestamp - a.timestamp) // Sort in descending order
-    .slice(0, 10) // Get the ten most recent tasks
+    .sort((a, b) => a.timestamp - b.timestamp); // Sort in ascending order
   return userTasks;
 }
 
@@ -73,17 +72,15 @@ export async function POST(req) {
       return new Response(JSON.stringify({ error: 'userId and note are required' }), { status: 400 });
     }
 
-    const timestamp = Date.now();
+    const timestamp = Date.now() * 1000;
     await appendNoteToCSV(userId, timestamp, note);
 
     // Log the CSV content for debugging
     const fs = require('fs');
     const csvContent = fs.readFileSync('app/assets/notes.csv', 'utf8');
-    console.log('CSV Content:', csvContent);
 
     // Fetch the updated list of notes from the CSV
     const updatedNotes = await getNotesFromCSV(userId);
-    console.log('Updated Notes:', updatedNotes);
 
     return new Response(JSON.stringify({ message: 'Note added successfully', notes: updatedNotes }), { status: 200 });
   } catch (error) {

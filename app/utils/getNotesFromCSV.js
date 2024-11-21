@@ -30,9 +30,9 @@ export const getNotesFromCSV = async (userId, maxNotes = 10, abortSignal) => {
 
     rl.on('close', () => {
       // Sort notes in descending order to get the latest notes
-      notesBuffer.sort((a, b) => b.timestamp - a.timestamp);
+      notesBuffer.slice(0, notesBuffer.length).sort((a, b) => b.timestamp - a.timestamp);
       // Return the latest maxNotes
-      resolve(notesBuffer.slice(notesBuffer.length - 10, notesBuffer.length));
+      resolve(notesBuffer);
     });
 
     rl.on('error', (err) => {

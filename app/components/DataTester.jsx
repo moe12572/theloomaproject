@@ -68,8 +68,9 @@ const DataTester = () => {
       } else {
         setError(null);
         setNote(""); // Clear the note input
-        alert("Note added successfully!");
         setResult(data.notes); // Update the result with the updated notes
+        alert("Note added successfully! See the result below.");
+        fetchData();
       }
     } catch (err) {
       setError(`Failed to add note. Please try again. Error: ${err.message}`);
