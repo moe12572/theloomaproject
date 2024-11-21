@@ -85,6 +85,8 @@ export async function POST(req) {
     return new Response(JSON.stringify({ message: 'Note added successfully', notes: updatedNotes }), { status: 200 });
   } catch (error) {
     console.error('Error adding note:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+    return new Response(JSON.stringify({
+      error: 'Internal Server Error. If you are running this from the hosted site, this will fail. To add a note you will have to run it locally since Vercel\'s serverless functions do not support writing to the file system.'
+    }), { status: 500 });
   }
 }
